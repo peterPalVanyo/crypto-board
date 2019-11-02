@@ -13,6 +13,7 @@ export class AppProvider extends Component {
             setPage: this.setPage,
             confirmFavorites: this.confirmFavorites
         }
+        console.log(this.state.page)
     }
     componentDidMount = () => {
         this.fetchCoins()
