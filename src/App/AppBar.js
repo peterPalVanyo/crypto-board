@@ -17,6 +17,7 @@ const ControlButtonEl = styled.div`
     props.active &&
     css`
       text-shadow: 5px 5px 30px #03ff03;
+      color: pink;
     `}
 `;
 function toProperCase(lower) {
@@ -37,7 +38,7 @@ export default function() {
       <Logo>CryptoBoard</Logo>
       <div></div>
       <ControlButton name='dashboard'/>
-      <ControlButton active name='setting'/>
+      <ControlButton active name='settings'/>
     </Bar>
   );
 }
