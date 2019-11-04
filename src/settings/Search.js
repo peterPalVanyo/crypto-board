@@ -31,7 +31,6 @@ const handleFilter = _.debounce((inputValue, coinList, setFilterCoins) => {
         let coinName = result.CoinName
         return (_.includes(fuzzyResult, symKey)  || _.includes(fuzzyResult, coinName))
     })
-    console.log(filteredCoins)
     setFilterCoins(filteredCoins)
 }, 1000)
 function filterCoins(e, setFilteredCoins, coinList) {

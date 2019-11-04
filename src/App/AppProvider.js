@@ -19,14 +19,31 @@ export class AppProvider extends Component {
             confirmFavorites: this.confirmFavorites,
             setFilteredCoins: this.setFilteredCoins
         }
-        console.log(this.state.page)
     }
     componentDidMount = () => {
         this.fetchCoins()
+        this.fetchPrices()
     }
     fetchCoins = async () => {
         let coinList = (await cc.coinList()).Data
         this.setState({coinList})
+    }
+    fetchPrices = async () => {
+        if(this.state.firstVisit) return
+        let prices = await this.prices()
+        //for empty price object, filter out no keys
+        prices = prices.filter(price => Object.keys(price).length)
+        this.setState({prices})
+    }
+    //came back with promise array
+    prices = async () => {
+        let returnData = []
+        for (let i = 0; i < this.state.favorites.length; i++) {
+            try {let priceData = await cc.priceFull(this.state.favorites[i], 'USD')
+            returnData.push(priceData)} catch(e) {
+                console.warn('Fetch price error: ', e)}
+        }
+        return returnData
     }
     addCoin = key => {
         let favorites = [...this.state.favorites]
@@ -44,7 +61,9 @@ export class AppProvider extends Component {
     isInFavorites = key => _.includes(this.state.favorites, key)
     //arrow so binds to the this
     confirmFavorites = () => {
-        this.setState({firstVisit: false, page: 'dashboard'})
+        this.setState({firstVisit: false, page: 'dashboard'}, () => {
+            this.fetchPrices()
+        })
         localStorage.setItem('cryptoBoard', JSON.stringify({favorites: this.state.favorites}))
     }
     savedSettings() {
