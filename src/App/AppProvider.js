@@ -17,6 +17,7 @@ export class AppProvider extends Component {
             removeCoin: this.removeCoin,
             isInFavorites: this.isInFavorites,
             confirmFavorites: this.confirmFavorites,
+            setCurrentFavorite: this.setCurrentFavorite,
             setFilteredCoins: this.setFilteredCoins
         }
     }
@@ -61,10 +62,22 @@ export class AppProvider extends Component {
     isInFavorites = key => _.includes(this.state.favorites, key)
     //arrow so binds to the this
     confirmFavorites = () => {
-        this.setState({firstVisit: false, page: 'dashboard'}, () => {
+        let currentFavorite = this.state.favorites[0]
+        console.log(currentFavorite)
+        this.setState({firstVisit: false, page: 'dashboard', currentFavorite}, () => {
             this.fetchPrices()
         })
-        localStorage.setItem('cryptoBoard', JSON.stringify({favorites: this.state.favorites}))
+        localStorage.setItem('cryptoBoard', JSON.stringify({favorites: this.state.favorites, currentFavorite}))
+    }
+    setCurrentFavorite = (sym) => {
+        this.setState({
+            currentFavorite: sym
+        })
+        //merge the current with the currentFavorite
+        localStorage.setItem('cryptoBoard', JSON.stringify({
+            ...JSON.parse(localStorage.getItem('cryptoBoard')),
+            currentFavorite: sym
+        }))
     }
     savedSettings() {
         let cryptoBoardData = JSON.parse(localStorage.getItem('cryptoBoard'))
@@ -72,8 +85,8 @@ export class AppProvider extends Component {
             return {page: 'settings', firstVisit: true}
         }
         //override the default favorites
-        let {favorites} = cryptoBoardData
-        return {favorites}
+        let {favorites, currentFavorite} = cryptoBoardData
+        return {favorites, currentFavorite}
     }
     setPage = page => this.setState({page})
     setFilteredCoins = (filteredCoins) => this.setState({filteredCoins})
