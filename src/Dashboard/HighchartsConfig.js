@@ -1,9 +1,9 @@
-export default function() {
+export default function(historical) {
     return {
         title: {
             text: ''
         },
-    
+        xAxis: {type: 'datetime'},
         yAxis: {
             title: {
                 text: 'Price'
@@ -24,10 +24,11 @@ export default function() {
             }
         },
     
-        series: [{
+        series: historical,
+/*         [{
             name: 'Installation',
             data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
-        }],
+        }], */
     
         responsive: {
             rules: [{

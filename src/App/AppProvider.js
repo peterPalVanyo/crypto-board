@@ -1,8 +1,10 @@
 import React, {Component} from 'react'
 import _ from 'lodash'
+import moment from 'moment'
 
 const cc = require('cryptocompare')
 const MAX_FAVORITES =10
+const TIME_UNITS=10
 export const AppContext = React.createContext()
 
 export class AppProvider extends Component {
@@ -24,6 +26,7 @@ export class AppProvider extends Component {
     componentDidMount = () => {
         this.fetchCoins()
         this.fetchPrices()
+        this.fetchHistorical()
     }
     fetchCoins = async () => {
         let coinList = (await cc.coinList()).Data
@@ -36,6 +39,21 @@ export class AppProvider extends Component {
         prices = prices.filter(price => Object.keys(price).length)
         this.setState({prices})
     }
+    fetchHistorical = async () => {
+        if(this.state.firstVisit) return
+        let result = await this.historical()
+        console.log(result)
+        let historical = [
+            {
+                name: this.state.currentFavorite,
+                data: result.map((ticker, index) => [
+                    moment().subtract({month: TIME_UNITS - index}).valueOf(),
+                    ticker.USD
+                ])
+            }
+        ]
+        this.setState({historical})
+    }
     //came back with promise array
     prices = async () => {
         let returnData = []
@@ -45,6 +63,16 @@ export class AppProvider extends Component {
                 console.warn('Fetch price error: ', e)}
         }
         return returnData
+    }
+    historical = () => {
+        let promises= []
+        for(let units = TIME_UNITS; units > 0; units--) {
+            promises.push(
+                cc.priceHistorical(this.state.currentFavorite, ['USD'], 
+                moment().subtract({months: units}).toDate())
+            )
+        }
+        return Promise.all(promises)
     }
     addCoin = key => {
         let favorites = [...this.state.favorites]
@@ -63,7 +91,6 @@ export class AppProvider extends Component {
     //arrow so binds to the this
     confirmFavorites = () => {
         let currentFavorite = this.state.favorites[0]
-        console.log(currentFavorite)
         this.setState({firstVisit: false, page: 'dashboard', currentFavorite}, () => {
             this.fetchPrices()
         })
