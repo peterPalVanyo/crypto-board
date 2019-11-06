@@ -3,6 +3,7 @@ import _ from 'lodash'
 import moment from 'moment'
 
 const cc = require('cryptocompare')
+cc.setApiKey('0044193380b87e6561cca3c17a331cfcb18df8cbbe66728ba7f0c0a756b2b83f')
 const MAX_FAVORITES =10
 const TIME_UNITS=10
 export const AppContext = React.createContext()
@@ -47,6 +48,7 @@ export class AppProvider extends Component {
             {
                 name: this.state.currentFavorite,
                 data: result.map((ticker, index) => [
+                    //x and y value (10-9-7...)
                     moment().subtract({month: TIME_UNITS - index}).valueOf(),
                     ticker.USD
                 ])
@@ -91,15 +93,21 @@ export class AppProvider extends Component {
     //arrow so binds to the this
     confirmFavorites = () => {
         let currentFavorite = this.state.favorites[0]
-        this.setState({firstVisit: false, page: 'dashboard', currentFavorite}, () => {
+        this.setState({firstVisit: false,
+            page: 'dashboard',
+            currentFavorite, 
+            prices: null, 
+            historical: null}, () => {
             this.fetchPrices()
+            this.fetchHistorical()
         })
         localStorage.setItem('cryptoBoard', JSON.stringify({favorites: this.state.favorites, currentFavorite}))
     }
     setCurrentFavorite = (sym) => {
         this.setState({
-            currentFavorite: sym
-        })
+            currentFavorite: sym,
+            historical: null
+        }, this.fetchHistorical)
         //merge the current with the currentFavorite
         localStorage.setItem('cryptoBoard', JSON.stringify({
             ...JSON.parse(localStorage.getItem('cryptoBoard')),

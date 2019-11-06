@@ -12,7 +12,7 @@ export default function() {
         <AppContext.Consumer>
             {({historical}) => 
                 <Tile>
-                    <ReactHighcharts config={highchartsConfig(historical)}/>
+                    { historical ? <ReactHighcharts config={highchartsConfig(historical)}/> : <div>loading historical...</div>}
                 </Tile>
             }
         </AppContext.Consumer>
