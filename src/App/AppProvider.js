@@ -43,7 +43,6 @@ export class AppProvider extends Component {
     fetchHistorical = async () => {
         if(this.state.firstVisit) return
         let result = await this.historical()
-        console.log(result)
         let historical = [
             {
                 name: this.state.currentFavorite,
